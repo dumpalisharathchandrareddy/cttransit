@@ -49,7 +49,7 @@ class _TicketPageState extends State<TicketPage> with TickerProviderStateMixin {
 
   // Scales (CSS-like, subtle; inner capped at 1.00)
   static const double kOuterBegin = 0.92;
-  static const double kOuterEnd   = 1.08;
+  static const double kOuterEnd   = 1.17;
   static const double kInnerBegin = 0.90;
   static const double kInnerEnd   = 1.00;
 
