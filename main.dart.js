@@ -32114,7 +32114,7 @@ g=A.XM("Hartford, New Haven, Stamford, Bristol, Meriden,\nNew Britain, Wallingfo
 c=A.nl(d,A.c2(a4,d,c).w.a.b*0.04,d)
 f=e.e
 f===$&&A.b()
-return A.a59(A.d([new A.p6(a0,a2,0,B.i,new A.GL(d,d,1/0,56),d),s,new A.B_(a,r,q,B.wU,B.x7,a*0.1,a*0.13333333333333333,a*0.2,"assets/images/logo_3.png",0.75,0.92,1.08,0.9,1,d),p,o,n,A.ms(d,A.a59(A.d([i,h,g,c,A.XM("Expires "+f,A.i5(d,d,B.x2,d,d,d,d,d,d,d,d,b*0.042,d,d,B.dF,d,d,!0,d,d,d,d,d,d,d,d))],a3),B.aX,B.aZ),B.G,d,new A.d6(B.i,d,d,j,a1,d,B.b6),d,d,new A.bj(m,0,m,0),new A.bj(k,l,k,l),d,d,d)],a3),B.bA,B.aZ)}}
+return A.a59(A.d([new A.p6(a0,a2,0,B.i,new A.GL(d,d,1/0,56),d),s,new A.B_(a,r,q,B.wU,B.x7,a*0.1,a*0.13333333333333333,a*0.2,"assets/images/logo_3.png",0.75,0.92,1.17,0.9,1,d),p,o,n,A.ms(d,A.a59(A.d([i,h,g,c,A.XM("Expires "+f,A.i5(d,d,B.x2,d,d,d,d,d,d,d,d,b*0.042,d,d,B.dF,d,d,!0,d,d,d,d,d,d,d,d))],a3),B.aX,B.aZ),B.G,d,new A.d6(B.i,d,d,j,a1,d,B.b6),d,d,new A.bj(m,0,m,0),new A.bj(k,l,k,l),d,d,d)],a3),B.bA,B.aZ)}}
 A.a2v.prototype={
 $0(){var s=this.a
 if(s.c!=null){s=s.r
