@@ -23,13 +23,21 @@ class MyApp extends StatelessWidget {
       ),
       home: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
+appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          centerTitle: false,   // <- keep header left-aligned on all platforms
-          titleSpacing: 16,
+          centerTitle: false,   // keep header left-aligned on all platforms
+          titleSpacing: 0,      // avoid double spacing; we'll add our own padding
           toolbarHeight: 72,
-          title: const _HeaderTitle(),
+          title: Builder(
+            builder: (context) {
+              final w = MediaQuery.of(context).size.width;
+              return Padding(
+                padding: EdgeInsets.only(left: w * 0.012), // ~5px on 400px wide phones
+                child: const _HeaderTitle(),
+              );
+            },
+          ),
           actions: const [_CloseBtn()],
         ),
         body: const SafeArea(child: TicketPage()),
