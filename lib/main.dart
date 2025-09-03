@@ -16,10 +16,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // Hide status bar
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        scaffoldBackgroundColor: Colors.white,  // force pure white
+      ),
       home: Scaffold(
-        body: SafeArea(child: TicketPage()),
+        backgroundColor: Colors.white,
+        body: const SafeArea(
+          child: TicketPage(),  // TicketPage is StatefulWidget → no const
+        ),
       ),
     );
   }
@@ -49,7 +55,7 @@ class _TicketPageState extends State<TicketPage> with TickerProviderStateMixin {
 
   // Scales (CSS-like, subtle; inner capped at 1.00)
   static const double kOuterBegin = 0.92;
-  static const double kOuterEnd   = 1.17;
+  static const double kOuterEnd   = 1.17; // updated
   static const double kInnerBegin = 0.90;
   static const double kInnerEnd   = 1.00;
 
