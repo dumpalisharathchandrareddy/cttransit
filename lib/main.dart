@@ -19,12 +19,68 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        scaffoldBackgroundColor: Colors.white,  // force pure white
+        scaffoldBackgroundColor: Colors.white, // full white bg
       ),
       home: Scaffold(
         backgroundColor: Colors.white,
-        body: const SafeArea(
-          child: TicketPage(),  // TicketPage is StatefulWidget → no const
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: false,   // <- keep header left-aligned on all platforms
+          titleSpacing: 16,
+          toolbarHeight: 72,
+          title: const _HeaderTitle(),
+          actions: const [_CloseBtn()],
+        ),
+        body: const SafeArea(child: TicketPage()),
+      ),
+    );
+  }
+}
+
+class _HeaderTitle extends StatelessWidget {
+  const _HeaderTitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start, // left-aligned header
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'CTtransit',
+          style: TextStyle(
+            color: Color(0xFF3C4043),
+            fontWeight: FontWeight.bold,
+            fontSize: 24,
+          ),
+        ),
+        SizedBox(height: 2),
+        Text(
+          'Show operator your ticket',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF3C4043),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CloseBtn extends StatelessWidget {
+  const _CloseBtn();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: CircleAvatar(
+        backgroundColor: Colors.white,
+        child: IconButton(
+          icon: const Icon(Icons.close, color: Colors.black),
+          onPressed: () => Navigator.maybePop(context),
         ),
       ),
     );
@@ -103,155 +159,118 @@ class _TicketPageState extends State<TicketPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final w = MediaQuery.of(context).size.width;
+    // Wrap content in a centered, fixed max width so it's truly centered on iOS/Web
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Keep content centered within a reasonable width (looks centered everywhere)
+        final double maxContentWidth = math.min(constraints.maxWidth, 520);
 
-    // Responsive badge size: ~36% of width, clamped to [180, 320]
-    double badgeSize = w * 0.36;
-    badgeSize = math.max(180, math.min(320, badgeSize));
+        final w = math.min(constraints.maxWidth, maxContentWidth);
+        double badgeSize = w * 0.36;
+        badgeSize = math.max(180, math.min(320, badgeSize));
 
-    // Proportional geometry based on CSS 240px design
-    // (inset-8 => 32px, inset-12 => 48px, border-24 => 24px)
-    final double ringMargin  = badgeSize * (32 / 240);
-    final double whiteMargin = badgeSize * (48 / 240);
-    final double ringWidth   = badgeSize * (24 / 240);
+        // Proportional geometry based on CSS 240px design
+        final double ringMargin  = badgeSize * (32 / 240);
+        final double whiteMargin = badgeSize * (48 / 240);
+        final double ringWidth   = badgeSize * (24 / 240);
 
-    return Column(
-      children: [
-        AppBar(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              SizedBox(height: 12),
-              Text(
-                'CTtransit',
-                style: TextStyle(
-                  color: Color(0xFF3C4043),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
+        return Align(
+          alignment: Alignment.topCenter, // horizontally center the whole column
+          child: SizedBox(
+            width: maxContentWidth,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center, // center inner children
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.11),
+
+                // Badge
+                PulseBadge(
+                  size: badgeSize,
+                  outerAnim: _outerAnim,
+                  innerAnim: _innerAnim,
+                  outerColor: kOuterColor,
+                  ringColor: kRingColor,
+                  ringWidth: ringWidth,
+                  ringMargin: ringMargin,
+                  whiteMargin: whiteMargin,
+                  logoPath: 'assets/images/logo_3.png',
+                  logoScale: 0.75,
+                  outerBegin: kOuterBegin,
+                  outerEnd: kOuterEnd,
+                  innerBegin: kInnerBegin,
+                  innerEnd: kInnerEnd,
                 ),
-              ),
-              Text(
-                'Show operator your ticket',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF3C4043),
-                ),
-              ),
-              SizedBox(height: 10),
-            ],
-          ),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          actions: [
-            Container(
-              margin: const EdgeInsets.only(right: 10),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: const Offset(0, 3),
+
+                SizedBox(height: MediaQuery.of(context).size.height * 0.12),
+
+                // Time (centered)
+                Text(
+                  _formattedTime,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: w * 0.155,
+                    fontWeight: FontWeight.w900,
+                    color: const Color(0xFF3C4043),
                   ),
-                ],
-              ),
-              child: CircleAvatar(
-                backgroundColor: Colors.white,
-                child: IconButton(
-                  icon: const Icon(Icons.close, color: Colors.black),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
                 ),
-              ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+
+                // Ticket info card (centered because it lives inside the centered SizedBox)
+                Container(
+                  // no big side-margins; width is centered by parent SizedBox
+                  padding: EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height * 0.02,
+                    horizontal: w * 0.05,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start, // keep text left within the card
+                    children: [
+                      Text(
+                        'Adult 2 Hour - Local Service',
+                        style: TextStyle(
+                          fontSize: w * 0.062,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF3C4043),
+                        ),
+                      ),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.005),
+                      Text(
+                        'Hartford, New Haven, Stamford, Bristol, Meriden,\nNew Britain, Wallingford, and Waterbury',
+                        style: TextStyle(
+                          fontSize: w * 0.034,
+                          color: const Color(0xFF5F6267),
+                        ),
+                      ),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+                      Text(
+                        "Expires $_formattedDateAndTime",
+                        style: TextStyle(
+                          fontSize: w * 0.042,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF626569),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-
-        SizedBox(height: MediaQuery.of(context).size.height * 0.11),
-
-        // Responsive pulsing badge
-        PulseBadge(
-          size: badgeSize,
-          outerAnim: _outerAnim,
-          innerAnim: _innerAnim,
-          outerColor: kOuterColor,
-          ringColor: kRingColor,
-          ringWidth: ringWidth,        // responsive
-          ringMargin: ringMargin,      // responsive
-          whiteMargin: whiteMargin,    // responsive
-          logoPath: 'assets/images/logo_3.png',
-          logoScale: 0.75,             // % of white-circle diameter
-          outerBegin: kOuterBegin,
-          outerEnd: kOuterEnd,
-          innerBegin: kInnerBegin,
-          innerEnd: kInnerEnd,
-        ),
-
-        SizedBox(height: MediaQuery.of(context).size.height * 0.12),
-
-        Text(
-          _formattedTime,
-          style: TextStyle(
-            fontSize: w * 0.155,
-            fontWeight: FontWeight.w900,
-            color: const Color(0xFF3C4043),
           ),
-        ),
-        SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-
-        Container(
-          margin: EdgeInsets.symmetric(horizontal: w * 0.02),
-          padding: EdgeInsets.symmetric(
-            vertical: MediaQuery.of(context).size.height * 0.02,
-            horizontal: w * 0.05,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                spreadRadius: 2,
-                blurRadius: 5,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Adult 2 Hour - Local Service',
-                style: TextStyle(
-                  fontSize: w * 0.062,
-                  fontWeight: FontWeight.w500,
-                  color: const Color(0xFF3C4043),
-                ),
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-              Text(
-                'Hartford, New Haven, Stamford, Bristol, Meriden,\nNew Britain, Wallingford, and Waterbury',
-                style: TextStyle(
-                  fontSize: w * 0.034,
-                  color: const Color(0xFF5F6267),
-                ),
-              ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.04),
-              Text(
-                "Expires $_formattedDateAndTime",
-                style: TextStyle(
-                  fontSize: w * 0.042,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF626569),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
@@ -312,8 +331,7 @@ class PulseBadge extends StatelessWidget {
               ),
             ),
           ),
-
-          // 2) Inner thick ring (pulsing, capped)
+          // 2) Inner thick ring (pulsing)
           ScaleTransition(
             scale: innerScale,
             child: Container(
@@ -324,7 +342,6 @@ class PulseBadge extends StatelessWidget {
               ),
             ),
           ),
-
           // 3) White inner disk (mask)
           Container(
             margin: EdgeInsets.all(whiteMargin),
@@ -333,7 +350,6 @@ class PulseBadge extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-
           // 4) Logo on top
           Image.asset(
             logoPath,
