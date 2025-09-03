@@ -33,7 +33,7 @@ appBar: AppBar(
             builder: (context) {
               final w = MediaQuery.of(context).size.width;
               return Padding(
-                padding: EdgeInsets.only(left: w * 0.012), // ~5px on 400px wide phones
+                padding: EdgeInsets.only(left: w * 0.05), // ~5px on 400px wide phones
                 child: const _HeaderTitle(),
               );
             },
